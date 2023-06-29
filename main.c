@@ -1,6 +1,11 @@
 #include <stdio.h>
 
 /**
+ * Tabela utilizada na rotação de bits para cálculo de sub-chaves
+ */
+int tabelaRotacao[16] = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
+
+/**
  * Permuta a entrada de acordo com a tabelaPermutacao fornecida, retonando uma
  * saída com tamanhoPermutacao bits
  */
