@@ -205,13 +205,75 @@ void gerarSubchaves(unsigned long long chave64)
   }
 }
 
+/**
+ * Criptografa um bloco de 64 bits
+ */
+unsigned long long executarDes(unsigned long long bloco64, int decript)
+{
+  unsigned long long blocoPermutado = permutacaoInicial(bloco64);
+  printf("Após permutação inicial: %016llX\n", blocoPermutado);
+
+  unsigned long long metadeDireita = blocoPermutado & 0xFFFFFFFFULL;
+  unsigned long long metadeDireitaOriginal = blocoPermutado & 0xFFFFFFFFULL;
+  unsigned long long metadeEsquerda = (blocoPermutado >> 32) & 0xFFFFFFFFULL;
+  printf("Após divisão: ESQ=%016llX DIR=%016llX\n\n", metadeEsquerda, metadeDireita);
+
+  for (int round = 0; round < 16; round++)
+  {
+    // expande a metade direita para 48 bits
+    int tabelaExpansao[48] = {
+        32, 1, 2, 3, 4, 5,
+        4, 5, 6, 7, 8, 9,
+        8, 9, 10, 11, 12, 13,
+        12, 13, 14, 15, 16, 17,
+        16, 17, 18, 19, 20, 21,
+        20, 21, 22, 23, 24, 25,
+        24, 25, 26, 27, 28, 29,
+        28, 29, 30, 31, 32, 1};
+    metadeDireita = permutar(metadeDireita, tabelaExpansao, 48, 32);
+
+    // faz ou exclusivo com a subchave do round
+    if (decript == 1)
+    {
+      metadeDireita = metadeDireita ^ subchaves[15 - round];
+    }
+    else
+    {
+      metadeDireita = metadeDireita ^ subchaves[round];
+    }
+
+    // sbox
+    metadeDireita = substituir(metadeDireita);
+
+    // permutacao da saida do sbox
+    int tabelaPermutacaoSbox[32] = {
+        16, 7, 20, 21, 29, 12, 28, 17,
+        1, 15, 23, 26, 5, 18, 31, 10,
+        2, 8, 24, 14, 32, 27, 3, 9,
+        19, 13, 30, 6, 22, 11, 4, 25};
+    metadeDireita = permutar(metadeDireita, tabelaPermutacaoSbox, 32, 32);
+
+    // ou exclusivo com metade esquerda => nova metade direita
+    metadeDireita = metadeEsquerda ^ metadeDireita;
+
+    // troca metades e repete
+    metadeEsquerda = metadeDireitaOriginal | 0ULL;
+    metadeDireitaOriginal = metadeDireita | 0ULL;
+
+    printf("Rodada %d: ESQ=%016llX DIR=%016llX\n", round + 1, metadeEsquerda, metadeDireita);
+  }
+
+  unsigned long long resultaoPrePF = metadeDireita << 32 | metadeEsquerda;
+  return permutacaoInversa(resultaoPrePF);
+}
+
 int main()
 {
   unsigned long long chave = 0x133457799bbcdff1;
+  // unsigned long long mensagem = 0x0123456789abcdef;
+  unsigned long long mensagemCriptografada = 0X0378CA7080E0233B;
   gerarSubchaves(chave);
-  for (int i = 0; i < 16; i++)
-  {
-    printf("%016llX\n", subchaves[i]);
-  }
+
+  printf("\nResultado: %016llx\n", executarDes(mensagemCriptografada, 1));
   return 0;
 }
