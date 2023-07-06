@@ -138,6 +138,39 @@ unsigned long rotacionarBits(unsigned long chave28, int bits)
 }
 
 /**
+ * Utiliza o sbox especificado para alterar a entrada de 6 para 4 bits
+ */
+unsigned long long usarSbox(unsigned long long entrada, int indiceSbox)
+{
+  unsigned int primeiroBit = (entrada >> 5) & 0b1;
+  unsigned int ultimoBit = entrada & 0b1;
+  unsigned int linhaSbox = (primeiroBit << 1) | ultimoBit;
+
+  unsigned int coluna = (entrada >> 1) & 0b1111;
+
+  return sboxes[indiceSbox][linhaSbox * 16 + coluna];
+}
+
+/**
+ * Processa o bloco de 48 bits usando as caixas de substituição
+ */
+unsigned long long substituir(unsigned long long entrada)
+{
+  // Divide o número em 8 partes de 6 bits cada
+  unsigned long long mascara = 0x3F; // Máscara de 6 bits (0b00111111)
+  unsigned long long novoValor = 0ULL;
+  unsigned long long resultado = 0ULL;
+
+  for (int i = 0; i < 8; i++)
+  {
+    novoValor = usarSbox((entrada >> ((7 - i) * 6)) & mascara, i);
+    resultado = (resultado << 4) | novoValor & 0xF;
+  }
+
+  return resultado;
+}
+
+/**
  * Gera as subchaves de 48 bits a partir de uma chave de 64 bits
  */
 void gerarSubchaves(unsigned long long chave64)
