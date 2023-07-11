@@ -305,10 +305,35 @@ int executarDesArquivo(unsigned long long chave, char *caminhoArquivoEntrada, ch
 
   // Lê o arquivo em blocos de 64 bits até o final do arquivo
   int blocos = 1;
-  while ((elements_read = fread(&buffer, BLOCK_SIZE, 1, arquivoEntrada)) > 0)
+  while ((elements_read = fread(&buffer, 1, BLOCK_SIZE, arquivoEntrada)) > 0)
   {
+    // prenche blocos com menos de 64 bits na criptografia com zeros
+    if (elements_read < 8 && decrypt == 0)
+    {
+      buffer = buffer << (8 - elements_read) * 8;
+    }
+
     unsigned long long blocoResultante = executarDes(buffer, decrypt);
-    fwrite(&blocoResultante, BLOCK_SIZE, 1, arquivoSaida);
+
+    // remove zeros adicionados na criptografia
+    int bytesZero = 0;
+    if (decrypt == 1)
+    {
+      // se ainda há o que ler, nao faz nada
+      if (fread(&buffer, 1, BLOCK_SIZE, arquivoEntrada) > 0)
+      {
+        fseek(arquivoEntrada, -8, SEEK_CUR);
+      }
+      else
+      {
+        while ((blocoResultante & 0xFF) == 0)
+        {
+          blocoResultante = blocoResultante >> 8;
+          bytesZero++;
+        }
+      }
+    }
+    fwrite(&blocoResultante, BLOCK_SIZE - bytesZero, 1, arquivoSaida);
   }
 
   // Fecha os arquivo de entrada e saida
