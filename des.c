@@ -60,7 +60,7 @@ unsigned long long subchaves[16];
 
 /**
  * Permuta a entrada de acordo com a tabelaPermutacao fornecida, retonando uma
- * saída com tamanhoPermutacao bits
+ * saída com tamanhoTabela bits
  */
 unsigned long long permutar(unsigned long long entrada, int tabelaPermutacao[], int tamanhoTabela, int tamanhoEntrada)
 {
@@ -275,7 +275,7 @@ unsigned long long executarDes(unsigned long long bloco64, int decript)
 /**
  * Chama a função executarDes sobre um arquivo
  *
- * Utilize decript como 0 para enrcriptar e como 1 decriptar
+ * Utilize decript como 0 para encriptar e como 1 decriptar
  */
 int executarDesArquivo(unsigned long long chave, char *caminhoArquivoEntrada, char *caminhoArquivoSaida, int decrypt)
 {
