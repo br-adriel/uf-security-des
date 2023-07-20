@@ -56,3 +56,10 @@ main
 des
 des-alg
 des_alg
+
+# verificação de desempenho
+arquivo_original
+arquivo_criptografado
+arquivo_descriptografado
+tempo_criptografia.txt
+tempo_descriptografia.txt
