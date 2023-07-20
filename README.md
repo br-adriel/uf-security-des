@@ -44,3 +44,29 @@ deseja utilizar com o algoritmo
 executado
 - `[arquivo_saida]`: Caminho para o arquivo de saída
 - `[descriptografar]`: use `0` para criptografar e `1` para descriptografar
+
+## Medindo o desempenho
+
+Através da execução do script `medir_desempenho.py` é possível medir o tempo de
+execução do algoritmo na criptografia e descriprografia.
+
+O script funciona da seguinte forma:
+
+1. Um arquivo binário chamado `arquivo_original` é preenchido com 10KB usando
+interiros aleatórios, em seguida é feita a criptografia e descriptografia desse
+arquivo. O tempo é dessas operações é cronometrado e adicionado ao arquivo
+`tempo_criptografia.txt` e `tempo_descriptografia.txt` junto com o tamanho do
+arquivo em KB.
+
+2. Esse processo é repetido adicionando mais conteúdo ao `arquivo_original` até
+que ele atinja o tamanho de 2MB.
+
+### Alterando os parâmetros
+
+Para personalizar o tamanho do acréscimo de bytes, ou o limite máximo de tamanho
+do arquivo original, será necessário modificar o arquivo do script.
+
+A variável `tamanho_adicao`, na linha 23, controla o tamanho do ácrescimo no
+tamanho do arquivo a cada rodada.
+
+A variável `limite_tamanho`, na linha 24, controla o tamanho máximo do arquivo.
